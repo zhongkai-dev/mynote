@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>(function(d,z,s){s.src='https://'+d+'/400/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('vemtoutcheeg.com',9376647,document.createElement('script'))</script>
+  <script>(function(d,z,s){s.src='https://'+d+'/401/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('gizokraijaw.net',9376650,document.createElement('script'))</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Note Application</title>
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react-beautiful-dnd@13.1.1/dist/react-beautiful-dnd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #f0f9ff;
+      --accent: #3b82f6;
+      --text: #334155;
+      --text-light: #64748b;
+      --background: #f8fafc;
+      --card-bg: #ffffff;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--background);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      min-height: 100vh;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0.5rem;
+    }
+    
+    /* Mobile-specific layout for user page */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0.5rem;
+      }
+    }
+    
+    /* Desktop-specific layout for user page */
+    @media (min-width: 769px) {
+      .container {
+        max-width: 40rem;
+        padding: 1rem;
+      }
+    }
+
+    .admin-container {
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .header {
+      background: linear-gradient(-45deg, #8b5cf6, #93c5fd, #ffffff, #d8b4fe);
+      background-size: 400% 400%;
+      animation: gradientAnimation 10s ease infinite;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #1e293b;
+      box-shadow: var(--shadow);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .admin-header {
+      background: linear-gradient(-45deg, #7c3aed, #93c5fd, #ffffff, #c084fc);
+      background-size: 400% 400%;
+      animation: gradientAnimation 10s ease infinite;
+      padding: 0.75rem 1.5rem;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-header h1, .admin-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .admin-layout {
+      display: flex;
+      height: calc(100vh - 3.5rem);
+    }
+
+    .admin-sidebar {
+      width: 280px;
+      background: white;
+      border-right: 1px solid var(--border);
+      padding: 1rem;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .admin-sidebar h3 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      font-weight: 600;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-main {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background: var(--background);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.3rem;
+      background: var(--card-bg);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      position: sticky;
+      top: 1rem;
+      z-index: 10;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow);
+      margin-bottom: 1rem;
+    }
+
+    .nav button {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 0.4rem;
+      background: linear-gradient(135deg, #8b5cf6, #93c5fd);
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .nav button:hover {
+      background: linear-gradient(135deg, #7c3aed, #60a5fa);
+      transform: translateY(-1px);
+    }
+
+    .nav button.active {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      color: #8b5cf6;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+    }
+
+    .card-content {
+      color: var(--text);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .copy-btn {
+      margin-left: auto;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #8b5cf6;
+      border-radius: 0.4rem;
+      background: transparent;
+      color: #8b5cf6;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      font-size: 0.8rem;
+      display: block;
+      margin-left: auto;
+    }
+
+    .copy-btn:hover {
+      background: linear-gradient(135deg, #8b5cf6, #93c5fd);
+      border-color: transparent;
+      color: white;
+    }
+
+    .copy-btn.copied {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+
+    /* Admin panel styles */
+    .admin-login {
+      max-width: 400px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .form-group input, 
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 0.25rem;
+      font-family: inherit;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.25rem;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+    }
+
+    .btn-success {
+      background: var(--success);
+    }
+
+    .admin-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .admin-note-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .note-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .category-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 0.4rem;
+      margin-bottom: 0.4rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+
+    .category-item:hover {
+      background-color: var(--secondary);
+    }
+
+    .category-actions {
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    .add-category-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .add-category-form input {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 0.4rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .add-category-form input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .admin-link {
+      display: block;
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      font-size: 0.9375rem;
+    }
+
+    .admin-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: var(--danger);
+      padding: 0.5rem;
+      background-color: #fee2e2;
+      border-radius: 0.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .sorting-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      min-width: 150px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .sort-btn {
+      padding: 0.3rem 0.6rem;
+      border: none;
+      border-radius: 0.25rem;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+    }
+
+    .sort-btn.active {
+      background: var(--accent);
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+    }
+
+    .loader {
+      border: 3px solid rgba(226, 232, 240, 0.7);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .draggable-item {
+      cursor: grab;
+    }
+
+    .draggable-item:active {
+      cursor: grabbing;
+    }
+
+    .drag-handle {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 0.5rem;
+      cursor: grab;
+      color: #94a3b8;
+    }
+
+    .drag-handle:hover {
+      color: var(--primary);
+    }
+    
+    .dragging {
+      background-color: #f1f5f9 !important;
+      opacity: 0.7;
+    }
+
+    .btn-small {
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      min-width: unset;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.3rem;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.4rem;
+    }
+
+    .active-category {
+      border-left: 4px solid var(--accent);
+      background-color: var(--secondary);
+    }
+
+    /* SVG Icons */
+    .icon {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .icon-sm {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-light);
+      background: var(--card-bg);
+      border-radius: 0.75rem;
+      box-shadow: var(--shadow);
+      border: 1px dashed var(--border);
+    }
+    
+    .empty-state p {
+      margin: 0.5rem 0;
+      font-size: 0.9375rem;
+    }
+    
+    /* Footer styling */
+    .footer {
+      text-align: center;
+      padding: 1.5rem 0;
+      color: var(--text-light);
+      font-size: 0.875rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Get React and ReactDOM from loaded scripts
+    const { useState, useEffect } = React;
+    const { createRoot } = ReactDOM;
+    const { DragDropContext, Droppable, Draggable } = ReactBeautifulDnd;
+
+    // API functions
+    const api = {
+      fetchCategories: async function() {
+        try {
+          const response = await fetch('/api/categories', {
+            credentials: 'include'
+          });
+          const data = await response.json();
+          if (data.status === 'success') {
+            return data.categories;
+          } else {
+            console.error('Error fetching categories:', data.message);
+            return [];
+          }
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+          return [];
+        }
+      },
+      
+      fetchNotes: async function(categoryName) {
+        try {
+          const response = await fetch(`/api/notes?category_name=${encodeURIComponent(categoryName)}`, {
+            credentials: 'include'
+          });
+          const data = await response.json();
+          if (data.status === 'success') {
+            return data.notes;
+          } else {
+            console.error('Error fetching notes:', data.message);
+            return [];
+          }
+        } catch (error) {
+          console.error('Error fetching notes:', error);
+          return [];
+        }
+      },
+      
+      login: async function(username, password) {
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ username, password }),
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error logging in:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      logout: async function() {
+        try {
+          const response = await fetch('/api/auth/logout', {
+            credentials: 'include'
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error logging out:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      checkAuth: async function() {
+        try {
+          const response = await fetch('/api/auth/check', {
+            credentials: 'include'
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error checking auth:', error);
+          return { status: 'error', authenticated: false };
+        }
+      },
+      
+      addCategory: async function(name) {
+        try {
+          const response = await fetch('/api/categories', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ name }),
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error adding category:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      deleteCategory: async function(category_id) {
+        try {
+          const response = await fetch(`/api/categories/${category_id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error deleting category:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      addNote: async function(category_id, title, content) {
+        try {
+          const response = await fetch('/api/notes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ category_id, title, content }),
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error adding note:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      updateNote: async function(note_id, title, content) {
+        try {
+          console.log(`API: Updating note ${note_id} with title "${title}" and content "${content}"`);
+          console.log("Making PUT request to:", `/api/notes/${note_id}`);
+          const response = await fetch(`/api/notes/${note_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ title, content }),
+          });
+          console.log("API response status:", response.status);
+          const data = await response.json();
+          console.log("API response data:", data);
+          
+          // Add order property to the note if it's returned from the server
+          if (data.status === 'success' && data.note) {
+            data.note.order = data.note.order || 0; // Default order if not provided
+          }
+          
+          return data;
+        } catch (error) {
+          console.error('Error updating note:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      deleteNote: async function(note_id) {
+        try {
+          const response = await fetch(`/api/notes/${note_id}`, {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error deleting note:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      updateCategory: async function(category_id, name) {
+        try {
+          const response = await fetch(`/api/categories/${category_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ name }),
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error updating category:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      reorderCategories: async function(orderedCategories) {
+        try {
+          const response = await fetch('/api/categories/reorder', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ orderedCategories }),
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error reordering categories:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      },
+      
+      reorderNotes: async function(orderedNotes, categoryId) {
+        try {
+          const response = await fetch('/api/notes/reorder', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ orderedNotes, categoryId }),
+          });
+          return await response.json();
+        } catch (error) {
+          console.error('Error reordering notes:', error);
+          return { status: 'error', message: 'Network error' };
+        }
+      }
+    };
+
+    // Loading component
+    function Loading() {
+      return (
+        <div className="loading">
+          <div className="loader"></div>
+        </div>
+      );
+    }
+
+    // Card component for displaying notes
+    function Card({ title, content }) {
+      const [copied, setCopied] = useState(false);
+
+      const copyToClipboard = () => {
+        // Create a fallback function that works on all browsers including mobile
+        const copyTextFallback = (text) => {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          let success = false;
+          try {
+            success = document.execCommand('copy');
+          } catch (err) {
+            console.error('Fallback: Unable to copy', err);
+          }
+          
+          document.body.removeChild(textArea);
+          return success;
+        };
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(content)
+            .then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            })
+            .catch(err => {
+              console.error("Clipboard API failed:", err);
+              const success = copyTextFallback(content);
+              if (success) {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }
+            });
+        } else {
+          const success = copyTextFallback(content);
+          if (success) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }
+        }
+      };
+
+      return (
+        <div className="card">
+          <h2>{title}</h2>
+          <div className="card-content" style={{ whiteSpace: 'pre-wrap' }}>{content}</div>
+          <button
+            className={`copy-btn ${copied ? "copied" : ""}`}
+            onClick={copyToClipboard}
+          >
+            {copied ? "Copied!" : "Copy"}
+          </button>
+        </div>
+      );
+    }
+
+    // Navigation component
+    function Navigation({ categories, activeCategory, setActiveCategory }) {
+      if (!categories || categories.length === 0) {
+        return <nav className="nav"><p>No categories found</p></nav>;
+      }
+      
+      return (
+        <nav className="nav">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              className={activeCategory === category.name ? "active" : ""}
+              onClick={() => setActiveCategory(category.name)}
+            >
+              {category.name}
+            </button>
+          ))}
+        </nav>
+      );
+    }
+
+    // Content component
+    function Content({ categoryName }) {
+      const [notes, setNotes] = useState([]);
+      const [isLoading, setIsLoading] = useState(true);
+      const [searchTerm, setSearchTerm] = useState("");
+      
+      useEffect(() => {
+        const loadNotes = async () => {
+          if (!categoryName) return;
+          
+          setIsLoading(true);
+          const notesData = await api.fetchNotes(categoryName);
+          setNotes(notesData);
+          setIsLoading(false);
+        };
+        
+        loadNotes();
+      }, [categoryName]);
+      
+      // Filter notes
+      const getFilteredNotes = () => {
+        return [...notes]
+          .filter(note => {
+            if (!searchTerm) return true;
+            const term = searchTerm.toLowerCase();
+            return (
+              note.title.toLowerCase().includes(term) ||
+              note.content.toLowerCase().includes(term)
+            );
+          });
+      };
+      
+      if (isLoading) {
+        return <Loading />;
+      }
+
+      const filteredNotes = getFilteredNotes();
+      
+      return (
+        <main>
+          <div className="sorting-controls">
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+              style={{ width: '100%' }}
+            />
+          </div>
+          
+          {filteredNotes.length > 0 ? (
+            filteredNotes.map((note) => (
+              <Card
+                key={note.id}
+                title={note.title}
+                content={note.content}
+              />
+            ))
+          ) : (
+            <p>{searchTerm ? "No notes match your search" : "No notes in this category"}</p>
+          )}
+        </main>
+      );
+    }
+
+    // Login form component
+    function LoginForm({ onLogin, loginError }) {
+      const [username, setUsername] = useState("");
+      const [password, setPassword] = useState("");
+      const [isLoading, setIsLoading] = useState(false);
+      
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        await onLogin(username, password);
+        setIsLoading(false);
+      };
+      
+      return (
+        <div className="admin-login">
+          <h2>Admin Login</h2>
+          {loginError && <p className="error-message">{loginError}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    // Admin panel component
+    function AdminPanel() {
+      const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
+      const [loginError, setLoginError] = useState("");
+      const [categories, setCategories] = useState([]);
+      const [selectedCategory, setSelectedCategory] = useState(null);
+      const [notes, setNotes] = useState([]);
+      const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+      const [showEditNoteModal, setShowEditNoteModal] = useState(false);
+      const [currentNote, setCurrentNote] = useState({ id: "", title: "", content: "" });
+      const [newCategoryName, setNewCategoryName] = useState("");
+      const [actionLoading, setActionLoading] = useState(false);
+      const [searchTerm, setSearchTerm] = useState("");
+      const [editingCategoryId, setEditingCategoryId] = useState(null);
+      const [editCategoryName, setEditCategoryName] = useState("");
+      
+      // Check if admin is logged in
+      useEffect(() => {
+        const checkAuth = async () => {
+          setIsLoading(true);
+          const authData = await api.checkAuth();
+          setAdminLoggedIn(authData.authenticated === true);
+          setIsLoading(false);
+        };
+        
+        checkAuth();
+      }, []);
+      
+      // Load categories when admin is logged in
+      useEffect(() => {
+        const loadCategories = async () => {
+          if (adminLoggedIn) {
+            const categoriesData = await api.fetchCategories();
+            setCategories(categoriesData);
+            
+            if (categoriesData.length > 0 && !selectedCategory) {
+              setSelectedCategory(categoriesData[0]);
+            }
+          }
+        };
+        
+        loadCategories();
+      }, [adminLoggedIn]);
+      
+      // Load notes when selected category changes
+      useEffect(() => {
+        const loadNotes = async () => {
+          if (adminLoggedIn && selectedCategory) {
+            setActionLoading(true);
+            const notesData = await api.fetchNotes(selectedCategory.name);
+            setNotes(notesData);
+            setActionLoading(false);
+          }
+        };
+        
+        loadNotes();
+      }, [selectedCategory, adminLoggedIn]);
+      
+      const handleLogin = async (username, password) => {
+        const result = await api.login(username, password);
+        
+        if (result.status === 'success') {
+          setAdminLoggedIn(true);
+          setLoginError("");
+        } else {
+          setLoginError(result.message || "Login failed");
+        }
+      };
+      
+      const handleLogout = async () => {
+        await api.logout();
+        setAdminLoggedIn(false);
+      };
+      
+      const goToMainSite = () => {
+        window.location.href = "/";
+      };
+
+      // Add a new category
+      const addCategory = async (e) => {
+        e.preventDefault();
+        
+        if (!newCategoryName) return;
+        
+        setActionLoading(true);
+        const result = await api.addCategory(newCategoryName);
+        
+        if (result.status === 'success') {
+          setNewCategoryName("");
+          const categoriesData = await api.fetchCategories();
+          setCategories(categoriesData);
+          
+          // Select the newly created category
+          const newCategory = categoriesData.find(c => c.name === newCategoryName);
+          if (newCategory) {
+            setSelectedCategory(newCategory);
+          }
+        } else {
+          alert("Error adding category: " + (result.message || "Unknown error"));
+        }
+        
+        setActionLoading(false);
+      };
+
+      // Delete a category
+      const deleteCategory = async (category) => {
+        if (!window.confirm(`Are you sure you want to delete the "${category.name}" category and all its notes?`)) {
+          return;
+        }
+        
+        setActionLoading(true);
+        const result = await api.deleteCategory(category.id);
+        
+        if (result.status === 'success') {
+          const categoriesData = await api.fetchCategories();
+          setCategories(categoriesData);
+          
+          if (selectedCategory && selectedCategory.id === category.id) {
+            setSelectedCategory(categoriesData.length > 0 ? categoriesData[0] : null);
+          }
+        } else {
+          alert("Error deleting category: " + (result.message || "Unknown error"));
+        }
+        
+        setActionLoading(false);
+      };
+
+      // Add a new note
+      const addNote = async (e) => {
+        e.preventDefault();
+        
+        if (!selectedCategory || !currentNote.title || !currentNote.content) return;
+        
+        setActionLoading(true);
+        const result = await api.addNote(selectedCategory.id, currentNote.title, currentNote.content);
+        
+        if (result.status === 'success') {
+          setShowAddNoteModal(false);
+          setCurrentNote({ id: "", title: "", content: "" });
+          const notesData = await api.fetchNotes(selectedCategory.name);
+          setNotes(notesData);
+        } else {
+          alert("Error adding note: " + (result.message || "Unknown error"));
+        }
+        
+        setActionLoading(false);
+      };
+
+      // Update a note
+      const updateNote = async (e, noteToUpdate = null) => {
+        e.preventDefault();
+        
+        // Use noteToUpdate if provided, otherwise use currentNote
+        const noteData = noteToUpdate || currentNote;
+        console.log("updateNote called with note data:", noteData);
+        
+        if (!noteData.id || !noteData.title || !noteData.content) {
+          console.error("Missing required note data for update");
+          return;
+        }
+        
+        try {
+          setActionLoading(true);
+          console.log("Updating note with ID:", noteData.id);
+          console.log("Title:", noteData.title);
+          console.log("Content:", noteData.content);
+          
+          const result = await api.updateNote(noteData.id, noteData.title, noteData.content);
+          
+          if (result.status === 'success') {
+            console.log("Note updated successfully");
+            
+            // If the server returned the updated note, update it directly in the state
+            if (result.note) {
+              console.log("Server returned updated note:", result.note);
+              // Preserve the order property from the original note if not provided in the response
+              const updatedNotes = notes.map(note => {
+                if (note.id === result.note.id) {
+                  return {
+                    ...result.note,
+                    order: result.note.order !== undefined ? result.note.order : note.order
+                  };
+                }
+                return note;
+              });
+              console.log("Updated notes array:", updatedNotes);
+              setNotes(updatedNotes);
+            } 
+            // Otherwise refresh notes list after update
+            else if (selectedCategory) {
+              console.log("Refreshing notes for category:", selectedCategory.name);
+              const notesData = await api.fetchNotes(selectedCategory.name);
+              setNotes(notesData);
+            }
+            
+            // Close the modal and reset current note
+            setShowEditNoteModal(false);
+            setCurrentNote({ id: "", title: "", content: "" });
+          } else {
+            console.error("Error updating note:", result.message);
+            alert("Error updating note: " + (result.message || "Unknown error"));
+          }
+        } catch (error) {
+          console.error("Exception updating note:", error);
+          alert("Error updating note: " + (error.message || "Unknown error"));
+        } finally {
+          setActionLoading(false);
+        }
+      };
+
+      // Delete a note
+      const deleteNote = async (noteId) => {
+        if (!window.confirm("Are you sure you want to delete this note?")) {
+          return;
+        }
+        
+        setActionLoading(true);
+        const result = await api.deleteNote(noteId);
+        
+        if (result.status === 'success') {
+          const notesData = await api.fetchNotes(selectedCategory.name);
+          setNotes(notesData);
+        } else {
+          alert("Error deleting note: " + (result.message || "Unknown error"));
+        }
+        
+        setActionLoading(false);
+      };
+
+      // Open edit modal
+      const openEditModal = (note) => {
+        console.log("Opening edit modal for note:", note);
+        // Make a deep copy of the note to avoid reference issues
+        setCurrentNote({
+          id: note.id,
+          title: note.title || "",
+          content: note.content || ""
+        });
+        console.log("Setting showEditNoteModal to true");
+        setShowEditNoteModal(true);
+        console.log("showEditNoteModal is now:", true);
+      };
+      
+      // Open add modal
+      const openAddModal = () => {
+        setCurrentNote({ id: "", title: "", content: "" });
+        setShowAddNoteModal(true);
+      };
+
+      // Filter notes
+      const getFilteredNotes = () => {
+        return [...notes]
+          .filter(note => {
+            if (!searchTerm) return true;
+            const term = searchTerm.toLowerCase();
+            return (
+              note.title.toLowerCase().includes(term) ||
+              note.content.toLowerCase().includes(term)
+            );
+          });
+      };
+      
+      // Add Note Modal - Fix for input focus issue
+      const AddNoteModal = () => {
+        // Use local state to prevent focus issues
+        const [localTitle, setLocalTitle] = useState(currentNote.title || "");
+        const [localContent, setLocalContent] = useState(currentNote.content || "");
+        
+        // Update parent state when submitting the form
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          // Update the parent state with local values
+          setCurrentNote({...currentNote, title: localTitle, content: localContent});
+          // Call the original addNote function with the updated values
+          addNote(e);
+        };
+        
+        return (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Add New Note</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="category">Category</label>
+                  <select 
+                    id="category"
+                    value={selectedCategory ? selectedCategory.id : ''}
+                    onChange={(e) => {
+                      const categoryId = e.target.value;
+                      const category = categories.find(c => c.id === categoryId);
+                      setSelectedCategory(category);
+                    }}
+                  >
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="title">Title</label>
+                  <input 
+                    type="text"
+                    id="title"
+                    value={localTitle}
+                    onChange={(e) => setLocalTitle(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="content">Content</label>
+                  <textarea 
+                    id="content"
+                    value={localContent}
+                    onChange={(e) => setLocalContent(e.target.value)}
+                    required
+                    rows={5}
+                  />
+                </div>
+                <div className="admin-actions">
+                  <button 
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => setShowAddNoteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="btn btn-success"
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? "Saving..." : "Save Note"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      };
+
+      // Edit Note Modal - Fix for input focus issue
+      const EditNoteModal = () => {
+        console.log("EditNoteModal rendered with currentNote:", currentNote);
+        // Use local state to prevent focus issues
+        const [localTitle, setLocalTitle] = useState(currentNote.title || "");
+        const [localContent, setLocalContent] = useState(currentNote.content || "");
+        
+        // Update local state when currentNote changes
+        useEffect(() => {
+          console.log("EditNoteModal useEffect triggered with currentNote:", currentNote);
+          setLocalTitle(currentNote.title || "");
+          setLocalContent(currentNote.content || "");
+        }, [currentNote]);
+        
+        // Update parent state when submitting the form
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          console.log("EditNoteModal form submitted with:", {localTitle, localContent});
+          
+          // Call the updateNote function directly with the local values
+          // instead of updating the parent state first
+          const noteToUpdate = {
+            id: currentNote.id,
+            title: localTitle,
+            content: localContent
+          };
+          console.log("Submitting note update with:", noteToUpdate);
+          
+          // Pass the noteToUpdate directly to updateNote
+          updateNote(e, noteToUpdate);
+        };
+        
+        return (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Edit Note</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label htmlFor="edit-title">Title</label>
+                  <input 
+                    type="text"
+                    id="edit-title"
+                    value={localTitle}
+                    onChange={(e) => setLocalTitle(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="edit-content">Content</label>
+                  <textarea 
+                    id="edit-content"
+                    value={localContent}
+                    onChange={(e) => setLocalContent(e.target.value)}
+                    required
+                    rows={5}
+                  />
+                </div>
+                <div className="admin-actions">
+                  <button 
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => setShowEditNoteModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="btn btn-success"
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? "Updating..." : "Update Note"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      };
+      
+      // Reorder categories
+      const handleCategoryDragEnd = async (result) => {
+        if (!result.destination) return;
+        if (result.destination.index === result.source.index) return;
+        
+        const reorderedCategories = Array.from(categories);
+        const [removed] = reorderedCategories.splice(result.source.index, 1);
+        reorderedCategories.splice(result.destination.index, 0, removed);
+        
+        // Update local state immediately
+        setCategories(reorderedCategories);
+        
+        // Send the update to the server
+        setActionLoading(true);
+        await api.reorderCategories(reorderedCategories);
+        setActionLoading(false);
+      };
+      
+      // Reorder notes
+      const handleNoteDragEnd = async (result) => {
+        if (!result.destination || !selectedCategory) return;
+        if (result.destination.index === result.source.index) return;
+        
+        const reorderedNotes = Array.from(notes);
+        const [removed] = reorderedNotes.splice(result.source.index, 1);
+        reorderedNotes.splice(result.destination.index, 0, removed);
+        
+        // Update local state immediately
+        setNotes(reorderedNotes);
+        
+        // Send the update to the server
+        setActionLoading(true);
+        await api.reorderNotes(reorderedNotes, selectedCategory.id);
+        setActionLoading(false);
+      };
+      
+      // Drag handle component
+      const DragHandle = () => (
+        <span className="drag-handle">
+          <svg className="icon" viewBox="0 0 24 24">
+            <circle cx="9" cy="7" r="1"></circle>
+            <circle cx="9" cy="12" r="1"></circle>
+            <circle cx="9" cy="17" r="1"></circle>
+            <circle cx="15" cy="7" r="1"></circle>
+            <circle cx="15" cy="12" r="1"></circle>
+            <circle cx="15" cy="17" r="1"></circle>
+          </svg>
+        </span>
+      );
+      
+      // Edit category
+      const startEditingCategory = (category) => {
+        setEditingCategoryId(category.id);
+        setEditCategoryName(category.name);
+      };
+      
+      const cancelEditingCategory = () => {
+        setEditingCategoryId(null);
+        setEditCategoryName("");
+      };
+      
+      const saveEditedCategory = async (e) => {
+        e.preventDefault();
+        
+        if (!editingCategoryId || !editCategoryName) return;
+        
+        setActionLoading(true);
+        
+        try {
+          // Add the update category API call here (you need to create this endpoint in your backend)
+          const result = await api.updateCategory(editingCategoryId, editCategoryName);
+          
+          if (result.status === 'success') {
+            // Refresh categories list
+            const categoriesData = await api.fetchCategories();
+            setCategories(categoriesData);
+            
+            // Update selected category if it was the one edited
+            if (selectedCategory && selectedCategory.id === editingCategoryId) {
+              const updatedCategory = categoriesData.find(c => c.id === editingCategoryId);
+              if (updatedCategory) {
+                setSelectedCategory(updatedCategory);
+              }
+            }
+            
+            setEditingCategoryId(null);
+            setEditCategoryName("");
+          } else {
+            alert("Error updating category: " + (result.message || "Unknown error"));
+          }
+        } catch (error) {
+          console.error("Error updating category:", error);
+          alert("Error updating category");
+        } finally {
+          setActionLoading(false);
+        }
+      };
+      
+      if (isLoading) {
+        return <Loading />;
+      }
+      
+      if (!adminLoggedIn) {
+        return <LoginForm onLogin={handleLogin} loginError={loginError} />;
+      }
+
+      const filteredNotes = getFilteredNotes();
+      
+      return (
+        <div className="admin-container">
+          <div className="admin-header">
+            <h1>User Management</h1>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button className="btn" onClick={goToMainSite}>
+                <svg className="icon" viewBox="0 0 24 24" style={{ marginRight: "0.3rem" }}>
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Back to Site
+              </button>
+              <button className="btn btn-danger" onClick={handleLogout}>
+                <svg className="icon" viewBox="0 0 24 24" style={{ marginRight: "0.3rem" }}>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+              </button>
+            </div>
+          </div>
+          
+          <div className="admin-layout">
+            {/* Categories Management - LEFT SIDEBAR */}
+            <div className="admin-sidebar">
+              <h3>Categories</h3>
+              
+              {/* Add new category form */}
+              <form className="add-category-form" onSubmit={addCategory}>
+                <input
+                  type="text"
+                  placeholder="New Category Name"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="btn btn-success btn-icon"
+                  disabled={actionLoading}
+                >
+                  <svg className="icon" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </form>
+              
+              {/* List of categories with drag-and-drop */}
+              <div style={{ marginTop: '1rem' }}>
+                {categories.length > 0 ? (
+                  <DragDropContext onDragEnd={handleCategoryDragEnd}>
+                    <Droppable droppableId="categories">
+                      {(provided) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                        >
+                          {categories.map((category, index) => (
+                            <Draggable
+                              key={category.id}
+                              draggableId={category.id}
+                              index={index}
+                            >
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  className={`category-item ${snapshot.isDragging ? 'dragging' : ''} draggable-item ${selectedCategory && selectedCategory.id === category.id ? 'active-category' : ''}`}
+                                  onClick={() => setSelectedCategory(category)}
+                                  style={{
+                                    ...provided.draggableProps.style,
+                                    paddingLeft: selectedCategory && selectedCategory.id === category.id ? '0.75rem' : '1rem'
+                                  }}
+                                >
+                                  {editingCategoryId === category.id ? (
+                                    <form 
+                                      onSubmit={saveEditedCategory}
+                                      style={{ display: 'flex', width: '100%', gap: '0.3rem' }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <input
+                                        type="text"
+                                        value={editCategoryName}
+                                        onChange={(e) => setEditCategoryName(e.target.value)}
+                                        autoFocus
+                                        style={{ flex: 1 }}
+                                      />
+                                      <button
+                                        type="submit"
+                                        className="btn btn-success btn-small"
+                                        disabled={actionLoading}
+                                      >
+                                        <svg className="icon icon-sm" viewBox="0 0 24 24">
+                                          <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="btn btn-danger btn-small"
+                                        onClick={cancelEditingCategory}
+                                      >
+                                        <svg className="icon icon-sm" viewBox="0 0 24 24">
+                                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                      </button>
+                                    </form>
+                                  ) : (
+                                    <>
+                                      <span>
+                                        <span {...provided.dragHandleProps}>
+                                          <svg className="icon drag-handle" viewBox="0 0 24 24">
+                                            <circle cx="9" cy="7" r="1"></circle>
+                                            <circle cx="9" cy="12" r="1"></circle>
+                                            <circle cx="9" cy="17" r="1"></circle>
+                                            <circle cx="15" cy="7" r="1"></circle>
+                                            <circle cx="15" cy="12" r="1"></circle>
+                                            <circle cx="15" cy="17" r="1"></circle>
+                                          </svg>
+                                        </span>
+                                        {category.name}
+                                      </span>
+                                      <div className="category-actions">
+                                        <button
+                                          className="btn btn-small"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            startEditingCategory(category);
+                                          }}
+                                          disabled={actionLoading}
+                                        >
+                                          <svg className="icon icon-sm" viewBox="0 0 24 24">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                          </svg>
+                                        </button>
+                                        <button
+                                          className="btn btn-danger btn-small"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteCategory(category);
+                                          }}
+                                          disabled={actionLoading}
+                                        >
+                                          <svg className="icon icon-sm" viewBox="0 0 24 24">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                          </svg>
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                ) : (
+                  <p>No categories found</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Notes Management - RIGHT CONTENT AREA */}
+            <div className="admin-main">
+              {selectedCategory ? (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h2>Notes in "{selectedCategory.name}"</h2>
+                    <button
+                      className="btn btn-icon btn-success"
+                      onClick={openAddModal}
+                      disabled={actionLoading}
+                    >
+                      <svg className="icon" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  {/* Search input */}
+                  <div className="sorting-controls">
+                    <input
+                      type="text"
+                      placeholder="Search notes..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="search-input"
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+                  
+                  {/* Notes list with drag-and-drop */}
+                  <div className="note-list" style={{ marginTop: '1rem' }}>
+                    {actionLoading ? (
+                      <Loading />
+                    ) : filteredNotes.length > 0 ? (
+                      <DragDropContext onDragEnd={handleNoteDragEnd}>
+                        <Droppable droppableId="notes">
+                          {(provided) => (
+                            <div
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {filteredNotes.map((note, index) => (
+                                <Draggable
+                                  key={note.id}
+                                  draggableId={note.id}
+                                  index={index}
+                                >
+                                  {(provided, snapshot) => (
+                                    <div
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      className={`card ${snapshot.isDragging ? 'dragging' : ''} draggable-item`}
+                                    >
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <h3>
+                                          <span {...provided.dragHandleProps}>
+                                            <svg className="icon drag-handle" viewBox="0 0 24 24">
+                                              <circle cx="9" cy="7" r="1"></circle>
+                                              <circle cx="9" cy="12" r="1"></circle>
+                                              <circle cx="9" cy="17" r="1"></circle>
+                                              <circle cx="15" cy="7" r="1"></circle>
+                                              <circle cx="15" cy="12" r="1"></circle>
+                                              <circle cx="15" cy="17" r="1"></circle>
+                                            </svg>
+                                          </span>
+                                          {note.title}
+                                        </h3>
+                                        <div className="category-actions">
+                                          <button
+                                            className="btn btn-small"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              console.log("Edit button clicked for note:", note);
+                                              openEditModal(note);
+                                            }}
+                                            disabled={actionLoading}
+                                          >
+                                            <svg className="icon icon-sm" viewBox="0 0 24 24">
+                                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                          </button>
+                                          <button
+                                            className="btn btn-danger btn-small"
+                                            onClick={() => deleteNote(note.id)}
+                                            disabled={actionLoading}
+                                          >
+                                            <svg className="icon icon-sm" viewBox="0 0 24 24">
+                                              <polyline points="3 6 5 6 21 6"></polyline>
+                                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <p style={{ whiteSpace: 'pre-wrap' }}>{note.content}</p>
+                                    </div>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    ) : (
+                      <p>{searchTerm ? "No notes match your search" : "No notes found in this category"}</p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <h2>Select a category</h2>
+                    <p>Please select a category from the sidebar to manage its notes</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Modals */}
+          {console.log("showAddNoteModal:", showAddNoteModal)}
+          {console.log("showEditNoteModal:", showEditNoteModal)}
+          {showAddNoteModal && <AddNoteModal />}
+          {showEditNoteModal && <EditNoteModal />}
+        </div>
+      );
+    }
+
+    // Main App component
+    function App() {
+      const [categories, setCategories] = useState([]);
+      const [activeCategory, setActiveCategory] = useState("");
+      const [isLoading, setIsLoading] = useState(true);
+      const isAdminPath = window.location.pathname.includes('/admin');
+      
+      // Load categories on component mount
+      useEffect(() => {
+        const loadData = async () => {
+          setIsLoading(true);
+          const categoriesData = await api.fetchCategories();
+          setCategories(categoriesData);
+          
+          if (categoriesData.length > 0) {
+            setActiveCategory(categoriesData[0].name);
+          }
+          setIsLoading(false);
+        };
+        
+        if (!isAdminPath) {
+          loadData();
+        }
+      }, [isAdminPath]);
+      
+      if (isAdminPath) {
+        return (
+          <div className="admin-container">
+            <AdminPanel />
+          </div>
+        );
+      }
+      
+      if (isLoading) {
+        return (
+          <div className="container">
+            <header className="header">
+              <h1>Note Application</h1>
+            </header>
+            <Loading />
+          </div>
+        );
+      }
+      
+      return (
+        <div className="container">
+          <header className="header">
+            <h1>Note Application</h1>
+          </header>
+          <Navigation
+            categories={categories}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+          />
+          <Content categoryName={activeCategory} />
+          <a href="/admin" className="admin-link">Admin Panel</a>
+        </div>
+      );
+    }
+
+    // Render the app
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html> 
