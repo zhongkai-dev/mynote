@@ -19,8 +19,7 @@ const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1);
 
 // MongoDB connection string
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://note:note@cluster0.hdlzqpn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
+const MONGODB_URI = process.env.MONGODB_URI;
 // Middleware
 app.use(cors({
   origin: function(origin, callback) {
